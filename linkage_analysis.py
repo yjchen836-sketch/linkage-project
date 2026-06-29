@@ -14,16 +14,16 @@ Mechanism topology (K → I):
     C
     │  [blue link C-D, length L_CD]
     ▼
-    D  ←── also constrained: D is an arm of the CYAN rigid body (pivot E)
+    D  ←── D is an arm of the CYAN rigid body (pivot E, fixed)
     │        cyan body EDH:  E(fixed pivot) – D(arm, L_ED) – H(arm, L_EH)
     │        α_DEH = fixed angle between ED and EH on the cyan body
     ▼
     H (on cyan body, also a vertex of the green triangle)
     │
     │  green rigid triangle I-H-G:
-    │    G is also constrained by light-green link F-G  (L_FG, F fixed)
+    │    G also constrained by light-green link F-G  (L_FG, F fixed)
     │    |GH| = L_GH (rigid triangle side)
-    │    I is at (L_HI, α_GHI from H towards I) on the triangle
+    │    I at angle α_GHI from HG direction (on green body)
     ▼
     I  (output point)
 
@@ -31,12 +31,12 @@ Geometric quantities required:
   Fixed coords : A, E, F  (all in fixed frame JAEF)
   Link lengths : L_KB, L_AB, L_AC, L_CD
                  L_ED, L_EH          (cyan rigid body arms from E)
-                 L_FG                (light-green link)
+                 L_FG                (light-green link F-G)
                  L_GH                (green triangle side G-H)
                  L_HI                (green triangle side H-I)
   Angles       : α_BAC  – angle from AB to AC on red body
                  α_DEH  – angle from ED to EH on cyan body
-                 α_GHI  – angle from HG to HI direction on green body
+                 α_GHI  – angle from HG to HI on green body
 
 Usage:
   python linkage_analysis.py           # interactive (drag slider)
@@ -58,47 +58,50 @@ matplotlib.rcParams['axes.unicode_minus'] = False
 # ══════════════════════════════════════════════════════════════════════
 
 P = {
-    # ── Fixed frame JAEF pivot coords (x, y) ──────────────────────
-    'J': np.array([10.0,  0.0]),   # slider rail anchor
-    'A': np.array([ 9.0, -3.0]),   # red body fixed pivot
-    'E': np.array([ 5.0, -1.5]),   # cyan body fixed pivot
-    'F': np.array([ 3.5,  0.0]),   # light-green link fixed pivot
+    # ── Fixed frame JAEF pivot coords (x, y) ──────────────────────────
+    'J': np.array([  0.00,   0.00]),   # slider rail anchor (measured)
+    'A': np.array([ -7.55,  -8.83]),   # red body fixed pivot (measured)
+    'E': np.array([ 44.98,  -4.13]),   # cyan body fixed pivot (measured)
+    'F': np.array([ 44.98,   1.87]),   # light-green link fixed pivot (measured)
 
-    # ── Slider K rail (horizontal line y = K_y) ───────────────────
-    'K_y'    :  0.0,
-    'K_x_min': 10.5,   # stroke start (input min)
-    'K_x_max': 13.0,   # stroke end   (input max)
+    # ── Slider K rail (horizontal line y = K_y) ───────────────────────
+    'K_y'    :  0.25,
+    'K_x_min':  0.54,   # stroke start (input min, measured)
+    'K_x_max': 10.50,   # stroke end   (input max, measured)
 
-    # ── Red rigid body (pivot A) ──────────────────────────────────
-    'L_KB'  : 2.5,     # K – B
-    'L_AB'  : 3.5,     # A – B
-    'L_AC'  : 2.5,     # A – C
-    'α_BAC' : np.radians(55),   # angle from AB to AC on red body [rad]
+    # ── Red rigid body (pivot A) ──────────────────────────────────────
+    'L_KB'  : 10.15,   # K – B (measured)
+    'L_AB'  : 11.00,   # A – B (measured)
+    'L_AC'  : 11.50,   # A – C (measured)
+    'α_BAC' : np.radians(0.9201375817),   # ∠BAC on red body (measured) [rad]
 
-    # ── Blue link ─────────────────────────────────────────────────
-    'L_CD'  : 5.0,     # C – D
+    # ── Blue link C-D ─────────────────────────────────────────────────
+    'L_CD'  : 22.00,   # C – D  ← measure and update
 
-    # ── Cyan rigid body EDH (pivot E) ────────────────────────────
-    # E is fixed pivot; D and H are arms on the same rigid body
-    'L_ED'  : 2.8,     # E – D  arm length
-    'L_EH'  : 3.8,     # E – H  arm length
-    'α_DEH' : np.radians(130),  # angle from ED to EH (on cyan body) [rad]
+    # ── Cyan rigid body EDH (pivot E) ─────────────────────────────────
+    # E is the FIXED pivot; D and H are both arms on this one rigid body.
+    # As D is pushed by the blue link, the whole body rotates about E,
+    # and H (the other arm) drives the green triangle.
+    'L_ED'  : 44.00,   # E – D  arm  ← measure and update
+    'L_EH'  : 62.00,   # E – H  arm  ← measure and update
+    'α_DEH' : np.radians(12),   # angle from ED to EH on cyan body [rad]  ← adjust
 
-    # ── Light-green link F-G (F fixed, G floats) ─────────────────
-    'L_FG'  : 3.0,     # F – G
+    # ── Light-green link F-G (F fixed, G floats) ──────────────────────
+    'L_FG'  : 62.00,   # F – G  ← measure and update
 
-    # ── Green rigid triangle I-H-G ────────────────────────────────
-    'L_GH'  : 2.8,     # G – H  (triangle side; also geometric constraint)
-    'L_HI'  : 5.0,     # H – I  arm from H to output
-    'α_GHI' : np.radians(50),   # angle from HG dir to HI dir on green body [rad]
+    # ── Green rigid triangle I-H-G ────────────────────────────────────
+    'L_GH'  : 10.00,   # G – H  triangle side  ← measure and update
+    'L_HI'  : 35.00,   # H – I  output arm     ← measure and update
+    'α_GHI' : np.radians(211),  # angle from HG dir to HI dir [rad]  ← adjust
+    # NOTE: α_GHI ≈ 211° directs I to the LEFT (negative x) as in the real mechanism.
+    # Fine-tune with the actual measured angle between HG and HI on the green body.
 }
 
-# Branch selection (+1 / -1) for the two solutions of each circle intersection.
-# Flip a sign if the mechanism adopts the wrong configuration.
+# Branch selection (+1 / -1).  Flip a sign if the mechanism pose is mirrored.
 SIGNS = {
     'B': 1,    # circle(A,L_AB) ∩ circle(K,L_KB)
-    'D': 1,    # circle(C,L_CD) ∩ circle(E,L_ED)
-    'G': -1,   # circle(F,L_FG) ∩ circle(H,L_GH)
+    'D': -1,   # circle(C,L_CD) ∩ circle(E,L_ED)
+    'G':  1,   # circle(F,L_FG) ∩ circle(H,L_GH)
 }
 
 
@@ -108,8 +111,8 @@ SIGNS = {
 
 def circle_intersect(c1, r1, c2, r2, sign=1):
     """
-    Intersection of two circles.  sign=+1/-1 picks one of the two solutions.
-    Returns None when the circles do not intersect.
+    Intersection of two circles.  sign=+1/-1 selects one of the two solutions.
+    Returns None when circles do not intersect.
     """
     diff = c2 - c1
     d = np.hypot(diff[0], diff[1])
@@ -128,17 +131,17 @@ def circle_intersect(c1, r1, c2, r2, sign=1):
 
 def solve(xk, p=None, s=None):
     """
-    Given slider x-coord xk, compute every joint.
+    Given slider x-coord xk, compute every joint position.
 
     Steps:
       ①  B : circle(A, L_AB)  ∩  circle(K, L_KB)
-      ②  C : red rigid body rotation angle th_AB → C
+      ②  C : red rigid body rotation th_AB → C
       ③  D : circle(C, L_CD)  ∩  circle(E, L_ED)   [D is arm of cyan body]
-      ④  H : cyan rigid body (pivot E): th_ED + α_DEH → H
-      ⑤  G : circle(F, L_FG)  ∩  circle(H, L_GH)   [light-green + rigid triangle]
-      ⑥  I : green triangle orientation th_HG + α_GHI → I
+      ④  H : cyan body (pivot E):  th_ED + α_DEH  → H
+      ⑤  G : circle(F, L_FG)  ∩  circle(H, L_GH)
+      ⑥  I : green triangle:  th_HG + α_GHI  → I
 
-    Returns a dict of 2-D positions, or None on dead-point / out-of-range.
+    Returns dict of positions, or None on dead-point / out-of-range.
     """
     if p is None: p = P
     if s is None: s = SIGNS
@@ -155,22 +158,22 @@ def solve(xk, p=None, s=None):
     th_AC = th_AB + p['α_BAC']
     C = p['A'] + p['L_AC'] * np.array([np.cos(th_AC), np.sin(th_AC)])
 
-    # ③ D  (D is on cyan body arm from E)
+    # ③ D  (D lies on cyan body arm from E; also on circle from C)
     D = circle_intersect(C, p['L_CD'], p['E'], p['L_ED'], s['D'])
     if D is None:
         return None
 
-    # ④ H  (cyan rigid body EDH pivots about E; α_DEH is the fixed body angle)
+    # ④ H  (cyan rigid body EDH pivots at E; α_DEH is fixed body angle)
     th_ED = np.arctan2(D[1] - p['E'][1], D[0] - p['E'][0])
     th_EH = th_ED + p['α_DEH']
     H = p['E'] + p['L_EH'] * np.array([np.cos(th_EH), np.sin(th_EH)])
 
-    # ⑤ G  (light-green link: G on circle(F, L_FG); green triangle: G at L_GH from H)
+    # ⑤ G  (F-G light-green link + green triangle side G-H)
     G = circle_intersect(p['F'], p['L_FG'], H, p['L_GH'], s['G'])
     if G is None:
         return None
 
-    # ⑥ I  (green rigid triangle I-H-G; α_GHI measured from HG direction at H)
+    # ⑥ I  (green rigid triangle; α_GHI from HG direction at H)
     th_HG = np.arctan2(G[1] - H[1], G[0] - H[0])
     th_HI = th_HG + p['α_GHI']
     I = H + p['L_HI'] * np.array([np.cos(th_HI), np.sin(th_HI)])
@@ -202,22 +205,22 @@ def sweep(p=None, s=None, n=500):
 
 
 # ══════════════════════════════════════════════════════════════════════
-#  Colours (matching original image as closely as possible)
+#  Colours
 # ══════════════════════════════════════════════════════════════════════
 
 C_ = {
-    'frame'      : '#424242',   # fixed frame dashes
-    'rail'       : '#9E9E9E',   # slider rail
-    'red'        : '#E53935',   # red rigid body
-    'BK'         : '#AD1457',   # link B-K
-    'blue'       : '#1565C0',   # blue link C-D
-    'cyan'       : '#00838F',   # cyan rigid body EDH
-    'lgreen'     : '#8BC34A',   # light-green link F-G
-    'green'      : '#2E7D32',   # green rigid triangle I-H-G
-    'trail'      : '#FF8F00',   # I-point trajectory
-    'K'          : '#7B1FA2',   # slider K
-    'I'          : '#E65100',   # output I
-    'fixed'      : '#263238',   # fixed-point markers
+    'frame'  : '#424242',
+    'rail'   : '#9E9E9E',
+    'red'    : '#E53935',
+    'BK'     : '#AD1457',
+    'blue'   : '#1565C0',
+    'cyan'   : '#00838F',
+    'lgreen' : '#8BC34A',
+    'green'  : '#2E7D32',
+    'trail'  : '#FF8F00',
+    'K'      : '#7B1FA2',
+    'I'      : '#E65100',
+    'fixed'  : '#263238',
 }
 
 
@@ -229,17 +232,15 @@ def draw_mechanism(ax, r, trail_I=None, p=None):
     if p is None: p = P
     ax.cla()
 
-    # rail
     ax.axhline(p['K_y'], color=C_['rail'], lw=1.2, ls='--', zorder=0,
                label='Rail (y=const)')
 
-    # I trajectory
     if trail_I is not None and len(trail_I) > 1:
         ax.plot(trail_I[:, 0], trail_I[:, 1], '-',
                 color=C_['trail'], lw=2, alpha=0.5, zorder=1,
                 label='Trajectory of I')
 
-    # fixed frame JAEF
+    # fixed frame
     frame = np.array([p['J'], p['A'], p['E'], p['F'], p['J']])
     ax.plot(frame[:, 0], frame[:, 1], '--', color=C_['frame'],
             lw=1.2, alpha=0.4, zorder=2)
@@ -258,34 +259,19 @@ def draw_mechanism(ax, r, trail_I=None, p=None):
         ax.plot([p1[0], p2[0]], [p1[1], p2[1]], ls,
                 color=color, lw=lw, zorder=3, **kw)
 
-    # ── slider link B-K ──
-    seg(r['B'], r['K'], C_['BK'], lw=2.5, label='B-K')
+    seg(r['B'], r['K'],  C_['BK'],     lw=2.5, label='B-K')
+    seg(r['A'], r['B'],  C_['red'],    lw=3.5)
+    seg(r['A'], r['C'],  C_['red'],    lw=3.5)
+    seg(r['B'], r['C'],  C_['red'],    lw=2,   label='Red body A-B-C  (pivot A)')
+    seg(r['C'], r['D'],  C_['blue'],   lw=2.5, label='Blue  C-D')
+    seg(r['E'], r['D'],  C_['cyan'],   lw=3.5)
+    seg(r['E'], r['H'],  C_['cyan'],   lw=3.5)
+    seg(r['D'], r['H'],  C_['cyan'],   lw=2,   label='Cyan body EDH  (pivot E)')
+    seg(r['F'], r['G'],  C_['lgreen'], lw=2.5, label='Lt-green  F-G')
+    seg(r['H'], r['G'],  C_['green'],  lw=3.5)
+    seg(r['H'], r['I'],  C_['green'],  lw=3.5)
+    seg(r['G'], r['I'],  C_['green'],  lw=2.5, label='Green triangle I-H-G')
 
-    # ── red rigid body: A-B, A-C, B-C ──
-    seg(r['A'], r['B'], C_['red'], lw=3.5)
-    seg(r['A'], r['C'], C_['red'], lw=3.5)
-    seg(r['B'], r['C'], C_['red'], lw=2,
-        label='Red body A-B-C  (pivot A)')
-
-    # ── blue link C-D ──
-    seg(r['C'], r['D'], C_['blue'], lw=2.5, label='Blue  C-D')
-
-    # ── cyan rigid body EDH: E-D, E-H, D-H ──
-    seg(r['E'], r['D'], C_['cyan'], lw=3.5)
-    seg(r['E'], r['H'], C_['cyan'], lw=3.5)
-    seg(r['D'], r['H'], C_['cyan'], lw=2,
-        label='Cyan body EDH  (pivot E)')
-
-    # ── light-green link F-G ──
-    seg(r['F'], r['G'], C_['lgreen'], lw=2.5, label='Lt-green  F-G')
-
-    # ── green rigid triangle I-H-G ──
-    seg(r['H'], r['G'], C_['green'], lw=3.5)
-    seg(r['H'], r['I'], C_['green'], lw=3.5)
-    seg(r['G'], r['I'], C_['green'], lw=2.5,
-        label='Green triangle I-H-G')
-
-    # ── joints ──
     joints = [
         ('K', r['K'],  C_['K'],     13, 's'),
         ('B', r['B'],  C_['red'],    8, 'o'),
@@ -301,7 +287,6 @@ def draw_mechanism(ax, r, trail_I=None, p=None):
         ax.annotate(name, pt, textcoords='offset points', xytext=(6, 5),
                     fontsize=11, color=col, fontweight='bold')
 
-    # angle info box
     ax.annotate(
         f"th_AB = {r['th_AB']:.1f} deg\n"
         f"th_ED = {r['th_ED']:.1f} deg\n"
@@ -320,7 +305,7 @@ def draw_mechanism(ax, r, trail_I=None, p=None):
 
 
 # ══════════════════════════════════════════════════════════════════════
-#  Relationship plots (bottom row)
+#  Relationship plots
 # ══════════════════════════════════════════════════════════════════════
 
 def draw_relations(axes, kxs, traj):
@@ -329,12 +314,11 @@ def draw_relations(axes, kxs, traj):
     Iy     = traj['I'][:, 1]
     dI_cum = np.cumsum(np.hypot(np.diff(Ix, prepend=Ix[0]),
                                 np.diff(Iy, prepend=Iy[0])))
-    specs = [
-        (ax1, Ix,     'I_x',        'I_x  vs  K_x',              C_['I']),
-        (ax2, Iy,     'I_y',        'I_y  vs  K_x',              '#1B5E20'),
-        (ax3, dI_cum, 'Cumul. arc', 'I cumul. displacement vs K_x', '#6A1B9A'),
-    ]
-    for ax, data, ylabel, title, col in specs:
+    for ax, data, ylabel, title, col in [
+        (ax1, Ix,     'I_x',        'I_x  vs  K_x',               C_['I']),
+        (ax2, Iy,     'I_y',        'I_y  vs  K_x',               '#1B5E20'),
+        (ax3, dI_cum, 'Cumul. arc', 'I cumul. displacement vs K_x','#6A1B9A'),
+    ]:
         ax.cla()
         ax.plot(kxs, data, '-', color=col, lw=2)
         ax.set_ylabel(ylabel, fontsize=9)
@@ -345,7 +329,7 @@ def draw_relations(axes, kxs, traj):
 
 
 # ══════════════════════════════════════════════════════════════════════
-#  Static output mode
+#  Static output
 # ══════════════════════════════════════════════════════════════════════
 
 def static_mode():
@@ -364,11 +348,9 @@ def static_mode():
     ax2     = fig.add_axes([0.38, 0.06, 0.28, 0.28])
     ax3     = fig.add_axes([0.72, 0.06, 0.24, 0.28])
 
-    # mid-stroke pose
     xk_mid = kxs[len(kxs) // 2]
     draw_mechanism(ax_mech, solve(xk_mid), traj['I'])
 
-    # XY trajectory
     ax_xy.plot(traj['I'][:, 0], traj['I'][:, 1], '-',
                color=C_['trail'], lw=2.5, label='I trajectory')
     ax_xy.plot(traj['K'][:, 0],
@@ -385,7 +367,6 @@ def static_mode():
     ax_xy.set_title('Trajectory of I  (XY plane)', fontsize=11, fontweight='bold')
     ax_xy.legend(fontsize=9)
 
-    # relationship curves
     draw_relations([ax1, ax2, ax3], kxs, traj)
     for ax_r, data in [(ax1, traj['I'][:, 0]), (ax2, traj['I'][:, 1])]:
         ax_r.plot(xk_mid, data[len(kxs) // 2], 'o', color='red', ms=8,
@@ -423,7 +404,7 @@ def interactive_mode():
 
     Ix = traj['I'][:, 0]
     Iy = traj['I'][:, 1]
-    ax_ix.plot(kxs, Ix, '-', color=C_['I'],  lw=2)
+    ax_ix.plot(kxs, Ix, '-', color=C_['I'],   lw=2)
     ax_iy.plot(kxs, Iy, '-', color='#2E7D32', lw=2)
     for ax_r, ylabel, title in [
         (ax_ix, 'I_x', 'I_x  vs  K_x'),
@@ -434,8 +415,8 @@ def interactive_mode():
         ax_r.set_title(title, fontsize=9, fontweight='bold')
         ax_r.grid(True, alpha=0.3)
 
-    dot_ix,   = ax_ix.plot([], [], 'o', color='red',  ms=9, zorder=5)
-    dot_iy,   = ax_iy.plot([], [], 'o', color='red',  ms=9, zorder=5)
+    dot_ix, = ax_ix.plot([], [], 'o', color='red', ms=9, zorder=5)
+    dot_iy, = ax_iy.plot([], [], 'o', color='red', ms=9, zorder=5)
     vl_ix = ax_ix.axvline(xk0, color='gray', lw=1, ls=':')
     vl_iy = ax_iy.axvline(xk0, color='gray', lw=1, ls=':')
 
