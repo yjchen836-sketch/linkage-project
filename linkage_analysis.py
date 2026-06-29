@@ -70,31 +70,29 @@ P = {
     'K_x_max': 10.50,   # stroke end   (input max, measured)
 
     # ── Red rigid body (pivot A) ──────────────────────────────────────
-    'L_KB'  : 10.15,   # K – B (measured)
-    'L_AB'  : 11.00,   # A – B (measured)
-    'L_AC'  : 11.50,   # A – C (measured)
-    'α_BAC' : np.radians(0.9201375817),   # ∠BAC on red body (measured) [rad]
+    'L_KB'  : 10.15,              # K – B (measured)
+    'L_AB'  : 11.00,              # A – B (measured)
+    'L_AC'  : 11.50,              # A – C (measured)
+    'α_BAC' : np.radians(52.72),  # ∠BAC on red body (measured)
 
     # ── Blue link C-D ─────────────────────────────────────────────────
-    'L_CD'  : 22.00,   # C – D  ← measure and update
+    'L_CD'  : 22.00,              # C – D (measured)
 
     # ── Cyan rigid body EDH (pivot E) ─────────────────────────────────
     # E is the FIXED pivot; D and H are both arms on this one rigid body.
     # As D is pushed by the blue link, the whole body rotates about E,
     # and H (the other arm) drives the green triangle.
-    'L_ED'  : 44.00,   # E – D  arm  ← measure and update
-    'L_EH'  : 62.00,   # E – H  arm  ← measure and update
-    'α_DEH' : np.radians(12),   # angle from ED to EH on cyan body [rad]  ← adjust
+    'L_ED'  :  5.50,              # E – D  arm (measured)
+    'L_EH'  : 30.00,              # E – H  arm (measured)
+    'α_DEH' : np.radians(58.18),  # angle from ED to EH on cyan body (measured)
 
     # ── Light-green link F-G (F fixed, G floats) ──────────────────────
-    'L_FG'  : 62.00,   # F – G  ← measure and update
+    'L_FG'  : 31.82,              # F – G (measured)
 
     # ── Green rigid triangle I-H-G ────────────────────────────────────
-    'L_GH'  : 10.00,   # G – H  triangle side  ← measure and update
-    'L_HI'  : 35.00,   # H – I  output arm     ← measure and update
-    'α_GHI' : np.radians(211),  # angle from HG dir to HI dir [rad]  ← adjust
-    # NOTE: α_GHI ≈ 211° directs I to the LEFT (negative x) as in the real mechanism.
-    # Fine-tune with the actual measured angle between HG and HI on the green body.
+    'L_GH'  :  5.70,              # G – H  triangle side (measured)
+    'L_HI'  : 26.50,              # H – I  output arm (measured)
+    'α_GHI' : np.radians(86.36),  # angle from HG dir to HI dir (measured)
 }
 
 # Branch selection (+1 / -1).  Flip a sign if the mechanism pose is mirrored.
